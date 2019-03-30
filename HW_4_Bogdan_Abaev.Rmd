@@ -1,0 +1,58 @@
+---
+title: "HW_4_Bogdan_Abaev"
+author: "Bogdan Abaev"
+date: "2/7/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("Lahman")
+library(Lahman)
+library(dplyr)
+```
+
+Option 2
+```{r, include = TRUE}
+# A
+player_df = select(Master, playerID, nameFirst,nameLast)
+
+# B
+no_salary = anti_join(x=player_df,y=Salaries,by="playerID")
+head(no_salary)
+tail(no_salary)
+dim(no_salary)
+```
+
+
+```{r, include=TRUE}
+#c
+dont_appear = anti_join(no_salary, Appearances,by="playerID")
+dim(dont_appear)
+```
+We can see that there are 193 players who do not have a salary that are not present in Appearances table. Thus, 
+almost all players (>13500) from no_salary table did participate in games of their teams.
+
+```{r}
+#d
+batting_df = select(Batting, playerID, AB)
+no_salary_batting = inner_join(no_salary, batting_df, "playerID")
+group = group_by(no_salary_batting,playerID)
+non_salary_atbats=summarise(group, ab = sum(AB, na.rm = TRUE))
+head(non_salary_atbats)
+tail(non_salary_atbats)
+dim(non_salary_atbats)
+dim(filter(non_salary_atbats, ab < 100))
+
+```
+
+Here we can see the table with players who do not hava a salary next to their total batting. Almost everyone from the 
+non-salary table is present in this table as well, therefore, in general, players did play in games they appeared in.
+However, one can note that more than a half of players from the table have a fairly low total batting, so this can be one of possible explanations to why there's no data on their salaries.
+
+
+
+
+
+
+

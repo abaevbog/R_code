@@ -1,0 +1,70 @@
+---
+title: "SupervisedLearning"
+author: "Bogdan Abaev"
+date: "3/12/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(factoextra)
+```
+
+```{r, include=TRUE}
+data(USArrests)
+P <- prcomp(USArrests, scale = TRUE)
+fviz_pca_biplot(P, repel = TRUE, # Avoid text overlapping
+                col.var = "red", # Variables color
+                col.ind = "black")  # Individuals color
+
+
+```
+We can see that california: is in the lower left corner of the graph. It means it is above average in urbanization, and also above average in crime rates. 
+Iowa is in the lower right cornet which means it is slightly below average in terms of both urbanization and crime rates. 
+```{r, include=TRUE}
+data(decathlon2)
+decathlon2$Competition = NULL
+P2 <- prcomp(decathlon2, scale = TRUE)
+fviz_pca_biplot(P2, repel = TRUE, # Avoid text overlapping
+                col.var = "red", # Variables color
+                col.ind = "black")  # Individuals color
+head(P2)
+```
+From the P2 we can see that PC1 has almost evenly distributed loadings among all disciplines except for pole vault, javeline and running 1500 meters. From the graph, it seems like PC1 shows if the athlete is better at running (left side of dim1) vs throwing (right side of dim1). PC2 has loadings on pole vault, high jump and 1500 meters run, so it seems like this component shows how good an athlete is at these stamina/jumping intensive activities.
+We can see that Macey is in the lower right square, which means that Maces is very much below average for dim2 (not good at jumping with a pole or running 1500 m) but he is on the right of Dim1, which means that he is pretty good at throwing, while not that great at running fast.
+Bourguignon is just a little bit above the average of dim2 (meaning, he jumps and runs for a long time just a bit better than others) and he is way on the left of dim1, meaning he runs short distances very well.
+```{r, include=TRUE}
+fviz_pca_ind(P2,
+              col.ind = decathlon2$Rank, 
+              gradient.cols = "red",
+              repel = TRUE   )
+```
+
+Based on the graph, majority of darker points are in the left upper corder, so seems like to get higher points, one has to be very good at running fast/for a long time and jumping with a pole over throwing and jumping high.
+```{r, include=TRUE}
+
+places <- read.csv("https://remiller1450.github.io/data/places.csv")
+pop_log = log(places$Pop)
+places$City = NULL
+places$CaseNum = NULL
+places$Lat = NULL
+places$Long = NULL 
+places$Pop = NULL
+places$StNum = NULL
+P3 = prcomp(places,scale=TRUE)
+```
+Based on the table, we can see that PC1 puts more loading on arts, healthcare, housingCost, transport. So PC1 could be called like general infrastructure or buplic sector. PC2 puts loadings on Econ and Education, so PC2 could be summarized as opportunities in a given city. PC3 is mainly climate, since most loading is on that variable.
+```{r, include=TRUE}
+fviz_eig(P3, addlabels = TRUE)
+```
+From the graph, 64.1% of the data can be explained with first 3 components. since these 3 components span all the variables from the data set, reducing data to these 3 components will not result in loosing any relations between variables 
+
+```{r, include=TRUE}
+fviz_pca_ind(P3,
+             col.ind = pop_log, 
+             gradient.cols = "red",
+             repel = TRUE,geom=c("point") )
+```
+It looks like most populated cities are in the right half of the graph, which means their infrastructure/public sector is above average, however their values for pc2(economics vs education) vary a lot, so it seems like population is mainly correlated with the infrastructure.
+
+New york is in the lower right corner, and it is very populated. As expected, New York is way above average on pc1 (infrustructure/public sector), and it is better for education rather than economics which is odd.

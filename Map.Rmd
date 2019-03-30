@@ -1,0 +1,33 @@
+---
+title: "Map"
+author: "Bogdan Abaev"
+date: "2/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r,  include=TRUE}
+library(plotly)
+df = read.csv('College/STA230/countries of the world.csv')
+l <- list(color = toRGB("grey"), width = 0.5)
+g <- list(
+     showframe = FALSE,
+     showcoastlines = FALSE,
+     projection = list(type = 'Mercator')
+ )
+p <- plot_geo(df) %>%
+     add_trace(
+         z = ~GDP....per.capita., color = ~GDP....per.capita., colors = 'Reds',
+         text = ~Country, locations = ~Country, locationmode ='country names', marker = list(line = l)
+     ) %>%
+     colorbar(title = 'GDP per capita', tickprefix = ' ') %>%
+     layout(
+         title = 'GDP per capita',
+         geo = g
+     )
+p
+```

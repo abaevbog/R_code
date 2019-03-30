@@ -1,0 +1,76 @@
+---
+title: "MapPres"
+author: "Bogdan Abaev"
+date: "2/21/2019"
+output: slidy_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## slide
+```{r,  include=TRUE}
+library(plotly)
+df = read.csv('College/STA230/world-happiness-report/2017.csv')
+l <- list(color = toRGB("grey"), width = 0.5)
+g <- list(
+     showframe = FALSE,
+     showcoastlines = FALSE,
+     projection = list(type = 'Mercator')
+ )
+p <- plot_geo(df) %>%
+     add_trace(
+         z = ~Happiness.Score, color = ~Happiness.Score, colors = 'Blues',
+         text = ~Country, locations = ~Country, locationmode ='country names', marker = list(line = l)
+     ) %>%
+     colorbar(title = 'Happiness', tickprefix = ' ') %>%
+     layout(
+         title = '2017 Happiness',
+         geo = g
+     )
+p
+
+df2 = read.csv('College/STA230/countries of the world.csv')
+l2 <- list(color = toRGB("grey"), width = 0.5)
+g2 <- list(
+     showframe = FALSE,
+     showcoastlines = FALSE,
+     projection = list(type = 'Mercator')
+ )
+p2 <- plot_geo(df2) %>%
+     add_trace(
+         z = ~GDP....per.capita., color = ~GDP....per.capita., colors = 'Reds',
+         text = ~Country, locations = ~Country, locationmode ='country names', marker = list(line = l)
+     ) %>%
+     colorbar(title = 'GDP per capita', tickprefix = ' ') %>%
+     layout(
+         title = 'GDP per capita',
+         geo = g
+     )
+p2
+
+df3 = read.csv('College/STA230/countries of the world.csv')
+df3$Literacy.... = gsub(",",".",df3$Literacy....)
+df3$Literacy....= as.numeric(df3$Literacy....)
+
+l3 <- list(color = toRGB("grey"), width = 0.5)
+g3 <- list(
+     showframe = FALSE,
+     showcoastlines = FALSE,
+     projection = list(type = 'Mercator')
+ )
+p3 <- plot_geo(df3) %>%
+     add_trace(
+         z = ~Literacy...., color = ~Literacy...., colors = 'Reds',
+         text = ~Country, locations = ~Country, locationmode ='country names', marker = list(line = l)
+     ) %>%
+     colorbar(title = 'GDP per capita', tickprefix = ' ') %>%
+     layout(
+         title = 'GDP per capita',
+         geo = g
+     )
+p3
+```
+
+

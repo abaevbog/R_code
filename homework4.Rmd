@@ -1,0 +1,73 @@
+---
+title: "homework4"
+author: "Bogdan Abaev"
+date: "2/24/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(stringr)
+```
+Option 2
+```{r,include=TRUE}
+# 1.
+veggies = c("carrot", "bean", "peas", "cabbage", "scallion", "asparagus")
+veggies[str_detect(veggies, "ea")]
+#2.
+emails = c(
+"simple@example.com",
+"johnsmith@email.gov",
+"marie.curie@college.edu",
+"very_common@example.com",
+"a.little.lengthy.but.ok@dept.example.com",
+"bad.email.because+symbol@example.com",
+"not_good@email.address",
+"this.email.is.fake@gmail.xcom")
+
+# list of valid domains. One can add more domains to the list if needed
+#(there are more than 1500 valid domains, so including them all wouldn't make
+#sense for the assignment)
+doms = c("com", "uk", "gov", "edu", "fr")
+
+#find and return the domain of the email
+# by separating string by . and taking the last substring
+domain = function(x){
+  x = unlist(strsplit(x,split='.', fixed = TRUE))
+  return(x[length(x)])
+}
+
+# check if the domain of the email is in the list of
+# valid domains
+has_good_domain = function(x){
+  domain = domain(x)
+  return (domain %in% doms) 
+}
+
+# check if the email has only letters and numbers
+letters_nums_only <- function(x) !grepl("[^[:alnum:] ]", x)
+
+
+# drop the non-alphanumeric characters that are allowed
+# in a valid email from the string
+drop_fine_chars = function(x) {
+  a = gsub("_", "", x, fixed=TRUE)
+  a = gsub(".","",a, fixed=TRUE)
+  a = gsub("-","",a, fixed=TRUE)
+  a = gsub("@","",a, fixed=TRUE)
+  return(a)
+}
+#check if the email is valid by checking if
+#the domain is valid, and then dropping all valid
+# non-alphanumeric characters and seeing if there are
+# any other non-alphanumeric characters (that are not allowed)
+valid_email = function(x){
+  good_domain = has_good_domain(x)
+  y = drop_fine_chars(x)
+  return (letters_nums_only(y)  && good_domain)
+}
+
+print(mapply(valid_email, emails))
+```
+
+

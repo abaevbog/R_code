@@ -1,0 +1,30 @@
+---
+title: "HW_5_Bogdan_Abaev"
+author: "Bogdan Abaev"
+date: "2/12/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(mosaic)
+
+```
+
+```{r, include=TRUE}
+AmesHousing <- read.csv("https://raw.githubusercontent.com/ds4stats/r-tutorials/master/data-viz/data/AmesHousing.csv")
+AmesHousing = filter(AmesHousing, Condition1=='Norm')
+AmesHousing = mutate(AmesHousing, TotalSqFt = GrLivArea+TotalBsmtSF )
+AmesHousing = filter(AmesHousing, TotalSqFt < 3000)
+AmesHousing = mutate(AmesHousing, FirePlacePresent = Fireplaces > 0)
+AmesHousing$FirePlacePresent = gsub('TRUE', 'YES', AmesHousing$FirePlacePresent)
+AmesHousing$FirePlacePresent = gsub('FALSE', 'NO', AmesHousing$FirePlacePresent)
+AmesHousing = mutate(AmesHousing, totalBath = FullBath + HalfBath)
+AmesHousing = mutate(AmesHousing, lastRemodeled = paste(substring(as.character(YearRemod.Add),0,3), "s",sep="0-"))
+head(AmesHousing)
+
+ggplot(data=AmesHousing) + geom_smooth(mapping = aes(x=log(TotalSqFt), y=log(SalePrice), color=BldgType), method=lm, se=FALSE, fullrange=TRUE) +   facet_grid(. ~ lastRemodeled) +labs(title="Figure 12: Housing Prices in Ames, Iowa")
+
+```
+

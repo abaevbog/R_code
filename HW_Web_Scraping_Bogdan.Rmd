@@ -1,0 +1,104 @@
+---
+title: "HomeworkWebScraping"
+author: "Bogdan Abaev"
+date: "2/28/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(rvest)
+library(stringr)
+library(readr)
+library(plotly)
+library(dplyr)
+```
+
+```{r}
+# this function goes through the set of links of the zoo website
+# visit each link, gets data about animal from the table
+# adds it to the result and returns this
+zoo_scrape = function(url) {
+  # read the initial web page
+  parse = read_html(url)
+  rows = html_node(parse, 'div.content')
+  #list of links
+  big_list = html_node(rows,'section')
+  links_to_animals = html_nodes(big_list, "a")
+  #create empty data frame with variable names
+  vec = c("Geographical Range", "Habitat","Scientific Name","Conservation Status")
+  df = data.frame(NA,NA,NA,NA,NA)
+  names(df) = c(c("Animal"),vec)
+  #go through each link and get data
+  i = 1
+  for (link in links_to_animals){
+    # this gets data
+    row = get_table(link)
+    #add it to the result
+    df[i,] = row
+    i = i + 1
+  }
+  #print to demonstrate and return it
+  print(df)
+  return(df)
+}
+
+
+# this function takes the link to a page of an animal
+# opens it, gets the table about animal and returns 
+# the vector with the data we need
+get_table = function(node){
+  # open link
+  addr = html_attr(node, "href")
+  url = paste("https://www.stlzoo.org",addr,sep = "")
+  animal_page = read_html(url)
+  #get the table
+  table_website = html_nodes(animal_page, "table")
+  table = html_table(table_website)[[1]]
+  #get the right data
+  name = html_text(html_nodes(animal_page,"h1")[3])
+  data = c( c(name), table$X2)
+  return(data)
+}
+# call to scrape saint louis zoo website
+res = zoo_scrape("https://www.stlzoo.org/animals/abouttheanimals/mammals/listallmammals")
+
+# brute force clean up
+regions = res$`Geographical Range`
+regions[grepl("South America",regions)] = "South America"
+regions[grepl("Russia",regions)] = "Asia"
+regions[grepl("Madagaskar",regions)] = "Africa"
+regions[grepl("Africa",regions)] = "Africa"
+regions[grepl("Britain",regions)] = "Europe"
+regions[grepl("United States",regions)] = "North America"
+regions[grepl("Asia",regions)] = "Asia"
+regions[grepl("Central America",regions)] = "Central America"
+regions[grepl("Australia",regions)] = "Australia"
+regions[grepl("North America",regions)] = "North America"
+regions[grepl("Ethiopia",regions)] = "Africa"
+regions[grepl("China",regions)] = "Asia"
+regions[grepl("Sumatra",regions)] = "Asia"
+regions[grepl("Indonesia",regions)] = "Asia"
+regions[grepl("Philippine",regions)] = "Asia"
+regions[grepl("Papua",regions)] = "Australia"
+regions[grepl("Chile",regions)] = "South America"
+regions[grepl("Mexico",regions)] = "South America"
+regions[grepl("India",regions)] = "Asia"
+regions[grepl("Brazil",regions)] = "South America"
+regions[grepl("ocean",regions)] = "Atlantic Ocean"
+res$`Geographical Range` = regions
+
+# group by region and conservation status
+gr = group_by(res, `Geographical Range`, `Conservation Status`)
+stat = count(gr)$`Conservation Status`
+#get the counts
+n = count(gr)$n
+loc = count(gr)$`Geographical Range`
+# plot the donut chart of percentage of animals from each
+# of defined earlier regions based on their conservation status
+plot_ly(labels = paste(stat,loc,sep=" from "), values = n) %>%
+     add_pie(hole = 0.6) %>%
+     layout(title = "Concervation status and origin chart",  showlegend = F,
+            xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+           yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+```

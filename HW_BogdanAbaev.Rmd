@@ -1,0 +1,44 @@
+---
+title: "Homework 1"
+author: "Bogdan Abaev"
+date: "1/23/2019"
+output:
+  html_document:
+    df_print: paged
+---
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+<center>
+Option 2 for homework
+</center>
+```{r}
+#Question 1
+Dat = read.csv("https://remiller1450.github.io/data/CollegeData.csv")
+#Question 4
+table(Dat$REGION,Dat$LOCALE)
+```
+
+The table above shows the two way relationship between the locale and the region variables. The top row represents the locales, and the left most column represents regions.
+Thus, every column Y from the table presents data about the number of schools from regions 1 ... 8 in Y locale, and every row X shows how many schools from X region fall into each of the locales.
+We can observe that most colleges are located in the 5th region all over different locales, with most colleges being present in locale 32.
+
+```{r, include=TRUE}
+#Question 7
+# vector - a valid non-empty vector of numeric values
+# percent - a decimal between 0 and 1
+trimmedmean = function(vector, percent){
+  #sort the vector
+  sorted = sort(vector)
+  # find the bottom and top cut-offs
+  leftPerc = quantile(sorted, percent)
+  rightPerc = quantile(sorted, 1-percent)
+  #trimm
+  trimmed = vector[vector < rightPerc & vector > leftPerc]
+  return (mean(trimmed))
+}
+
+trimmedmean(Dat$AVGFACSAL, 0.05)
+```
+

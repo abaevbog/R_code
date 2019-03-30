@@ -1,0 +1,63 @@
+---
+title: "HW3_Bogdan_Abaev"
+author: "Bogdan Abaev"
+date: "2/4/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("nycflights13")
+#install.packages("dplyr")
+library(nycflights13)
+library(dplyr)
+```
+
+Quetion 6:
+
+```{r, include=TRUE}
+# Question 6 a)
+df = select(flights,carrier, arr_delay) # get rid of columns we don't need
+df = mutate(df, late=arr_delay > 0)   # add boolean that shows if flight is late or not
+df = filter(df, !is.na( arr_delay))  # get rid of NA
+gr = group_by(df, carrier)     # group by carrier
+s = summarise(gr, prop = mean(late))  # summarize by finding mean of boolean values
+s
+# Question 6 b
+df = select(flights,carrier, arr_delay)    # get rid of columns we dont need
+df = filter(df, arr_delay > 0)    # we only consider flights that were late
+g = group_by(df, carrier)    # group flights by carrier
+summarise(g, avg = mean(arr_delay)) # find avg for delay for each carrier's delayed flights
+
+#Question 6 c
+df = select(flights,carrier, air_time, arr_delay )# get rid of columns we dont need
+df= filter(df, arr_delay > 0)   # we only consider flights that were late
+new_df = mutate(df, rel_late = arr_delay/air_time) # compute relative lateness of each flight
+gg = group_by(new_df, carrier) # group by carrier
+summarise(gg, avg = mean(rel_late)) # show avg of relative lateness of each carrier's delayed flights
+
+```
+
+
+Question 7:
+```{r include=TRUE}
+# q 7
+df = select(flights, carrier, arr_delay, air_time, distance) # get rid of columns we dont want
+df = mutate(df, late = arr_delay > 0) # add column that shows if flight departed late
+df = filter(df, !is.na(late))    # filter na's
+df = mutate(df, air_time_hr = air_time / 60)  # add column for air time in hours
+df = mutate(df, speed = distance / air_time_hr ) # add column for avg speed for each flight 
+g = group_by(df, late) # group flights by them being late
+summarise(g, avg_speed = mean(speed, na.rm =TRUE)) #summarise by finding their mean speed
+```
+
+As we see in the table above, the average speed of flights whose departure was late is 19 miles (or 5%) above the 
+average speed of the flights that departed on time or early. This might seem like a somewhat solid difference but in order to actually make some conclusions, we would need to take into account the other statistical measurements such as standard deviation to say if this result is statistically significant, or if it's just a property of this specific data set. Besides, if we wanted to make connection between delayed departure and attempts of the pilots to catch up with the schedule, we would also
+need to take into account other factos such as the typical speed of a plane on a particular route. For example, 
+flights that cover a shorter distance also tend to fly much slower than flights that go farther. This difference in speed depending on where the plane goes is an important confounding variable. Therefore, instead
+of finding simply the average speed between flights that departed late and not, we would want to find the average speed
+among flights (delayed and not) that follow roughly the same route in order to make any conclusions about flights 
+behavior.
+
+
+

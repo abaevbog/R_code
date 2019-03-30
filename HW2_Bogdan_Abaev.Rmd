@@ -1,0 +1,69 @@
+---
+title: "Homework2"
+author: "Bogdan Abaev"
+date: "1/28/2019"
+output: html_document
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("tidyr")
+#install.packages("readr")
+library(tidyr)     # contains tools to tidy data
+library(readr)     # a package for parsing data
+UBSprices2 = read.csv('https://raw.githubusercontent.com/ds4stats/r-tutorials/master/tidying-data/data/UBSprices2.csv')
+head(UBSprices2)
+```
+
+Question 4:
+We can see that in the data frame above, there are several observations in each row. Every row contains 6 observations: data from 2 time periods for each of 3 products. In addition, each column contains information about 2 variables: the name of the item and the year. It breaks 2 rules about tidy data.
+Therefore, to tidy this data, we need to create columns "Year", "Price" and "Item" and to separate the data into these 3 columns, so that each row will contain just one observation, and information about each of the variables is located in a separate column.
+```{r, include=TRUE}
+#Q4
+tidy_UBSprices2 = gather(data=UBSprices2, key=var, value = price, bigmac2003, rice2003,bread2003,bigmac2009,rice2009,bread2009)
+
+solution = separate(tidy_UBSprices2,var,c("Item", "Year"), -4)
+head(solution)
+```
+
+```{r, include=TRUE}
+#Q5
+
+set.seed(12345)
+driverfatalities <- data.frame(accident_id = paste0("A",1:50), driver1_dob = as.Date(runif(50, 1,1111), origin = as.Date("1975-05-10")), driver2_dob = as.Date(runif(50, 1,1111), origin = as.Date("1975-05-10")), driver1_status = sample(size = 50, c("Died(3)", "Survived(0)", "Survived(1)", "Survived(2)"), prob = c(.1,.4,.25,.25), replace = TRUE), driver2_status = sample(size = 50, c("Died(3)", "Survived(0)", "Survived(1)", "Survived(2)"), prob = c(.1,.4,.25,.25), replace = TRUE), driver1_passengers = rpois(50,0.6), driver2_passengers = rpois(50,0.6))
+head(driverfatalities)
+```
+Question 5:
+We can see that each row essentially contains data about two observations: it has data about driver1 and driver2 status/passengers/dob. Besides, the columns driver1_status and driver2_status  contain the data about two variables instead of one: the survival of the drivers and their injury status.Thus,to tidy this data set, we need to change columns for "accident_id", "driver", "dob", "status", "passengers" and "injury" so that each column contains only one specific variable. Then we will adjust rows correspondingly so that each row has information about data for each driver separately from another. Finally, we will break the column "status" into two columns so one has information about the death/survive status of the accident, and the other one - the injury status of a driver.
+
+```{r, include=TRUE}
+
+#Q5
+
+#from df1 we'll take column "dob", "accident_id" and "driver"
+df1 = gather(driverfatalities,driver, dob,driver1_dob,driver2_dob )
+df1$driver = parse_number(df1$driver)
+
+#df2 gives us the column "passenger"
+df2 = gather(driverfatalities,driver, passengers,driver1_passengers,driver2_passengers )
+
+#df3 gives us the columns "status" and "injury"
+df3 = gather(driverfatalities,driver, status,driver1_status,driver2_status)
+df3 = separate(df3,status, c("Status", "Injury"),-3)
+df3$Injury = parse_number(df3$Injury)
+
+#get the vectors we need from the dataframes above
+driver = df1$driver
+passengers = df2$passengers
+status = df3$Status
+injury = df3$Injury
+accident_id = df1$accident_id
+dob = df1$dob
+
+#collect them into a new dataframe
+result = data.frame(accident_id,driver,dob,status, injury,passengers)
+head(result)
+```
+
+
+
